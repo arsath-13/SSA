@@ -15,7 +15,7 @@ To run the application, follow these steps:
 2. Navigate to the project directory:
 
     ```bash
-    cd battery-management-system
+    cd SSA
     ```
 
 3. Install the required dependencies from the `requirements.txt` file using pip:
