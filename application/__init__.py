@@ -1,15 +1,10 @@
 from flask import Flask
-from flask_pymongo import PyMongo
-
-from securefiles import secretkey
+from application.services.battery_service.battery_service import BatteryService
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = secretkey.SECRET_KEY
-app.config["MONGO_URI"] = secretkey.MONGO_URI
-
-mongodb_client = PyMongo(app)
-db = mongodb_client.db
-
 
 
 from application import routes
+
+
+

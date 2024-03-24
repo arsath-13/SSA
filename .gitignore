@@ -1,1 +1,6 @@
 venv/
+application/datafiles/battery_data_files/unique_battery_dealer_data_files
+application/datafiles/battery_data_files/unique_battery_id_data_files
+application/datafiles/battery_data_files/unique_battery_year_data_files
+
+
