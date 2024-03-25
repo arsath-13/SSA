@@ -16,14 +16,19 @@ def directory_submit():
     directory = "application/datafiles/"+processed_text+".csv"
     battery_service = BatteryService()
 
-    battery_service.pre_processer_battery(directory=directory)
+    preprocess_message = battery_service.pre_processer_battery(directory=directory)
 
-    battery_service.unique_id_finder_battery(directory=directory)
+    unique_id_creator_message = battery_service.unique_id_finder_battery(directory=directory)
 
-    battery_service.unique_dealer_finder_battery(directory=directory)
+    unique_dealer_creator_message = battery_service.unique_dealer_finder_battery(directory=directory)
 
-    battery_service.unique_year_finder_battery(directory=directory)
+    unique_year_creator_message = battery_service.unique_year_finder_battery(directory=directory)
 
-    return render_template('index.html', processed_text=processed_text)
+    return render_template('index.html',
+                           processed_text=processed_text,
+                           preprocess_message = preprocess_message,
+                           unique_id_creator_message = unique_id_creator_message,
+                           unique_dealer_creator_message = unique_dealer_creator_message,
+                           unique_year_creator_message = unique_year_creator_message)
 
 

@@ -18,9 +18,14 @@
         </div>
         {% if processed_text %}
             <div class="result">
-                <p>Datafile {{ processed_text }} is processed.</p>
+                <br />
+                <p>{{ preprocess_message }}</p>
+                <p>{{ unique_id_creator_message }}</p>
+                <p>{{ unique_dealer_creator_message }}</p>
+                <p>{{ unique_year_creator_message }}</p>
             </div>
         {% endif %}
+
 
     </div>
 {% endblock %}
