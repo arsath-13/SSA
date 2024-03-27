@@ -18,7 +18,7 @@ def directory_submit():
 
     preprocess_message = battery_service.pre_processer_battery(directory=directory)
 
-    unique_id_creator_message = battery_service.unique_id_finder_battery(directory=directory)
+    unique_id_creator_message, unique_names_list = battery_service.unique_id_finder_battery(directory=directory)
 
     unique_dealer_creator_message = battery_service.unique_dealer_finder_battery(directory=directory)
 
@@ -26,9 +26,8 @@ def directory_submit():
 
     return render_template('index.html',
                            processed_text=processed_text,
-                           preprocess_message = preprocess_message,
-                           unique_id_creator_message = unique_id_creator_message,
-                           unique_dealer_creator_message = unique_dealer_creator_message,
-                           unique_year_creator_message = unique_year_creator_message)
-
-
+                           preprocess_message=preprocess_message,
+                           unique_id_creator_message=unique_id_creator_message,
+                           unique_names_list=unique_names_list,
+                           unique_dealer_creator_message=unique_dealer_creator_message,
+                           unique_year_creator_message=unique_year_creator_message)

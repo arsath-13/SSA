@@ -17,15 +17,29 @@
             </form>
         </div>
         {% if processed_text %}
-            <div class="result">
+            <div class="processing-results">
                 <br />
-                <p>{{ preprocess_message }}</p>
-                <p>{{ unique_id_creator_message }}</p>
-                <p>{{ unique_dealer_creator_message }}</p>
-                <p>{{ unique_year_creator_message }}</p>
+                <div class="preprocess-message">
+                    <p>{{ preprocess_message }}</p>
+                </div>
+                <div class="unique-id-message">
+                    <p>{{ unique_id_creator_message }}</p>
+                    <h3>These are the unique battery types</h3>
+                    <hr>
+                    <ol>
+                    {% for item in unique_names_list %}
+                        <li><p>{{ item }}</p></li>
+                    {% endfor %}
+                    </ol>
+                    <hr>
+                </div>
+                <div class="unique-dealer-message">
+                    <p>{{ unique_dealer_creator_message }}</p>
+                </div>
+                <div class="unique-year-message">
+                    <p>{{ unique_year_creator_message }}</p>
+                </div>
             </div>
         {% endif %}
-
-
     </div>
 {% endblock %}
