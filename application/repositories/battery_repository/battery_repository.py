@@ -1,30 +1,60 @@
 import pandas as pd
+from io import StringIO
 import os
 import re
 
 class BatteryRepository:
 
-    def pre_processor_battery(self, directory):
+    def pre_processor_battery(self, file):
         try:
-            df = pd.read_csv(directory)
-            df.dropna(inplace=True)
-            df.rename(columns={'ITEMID': 'Item ID'}, inplace=True)
-            df.to_csv(directory, index=False)
-            preprocess_message = "Battery Data file preprocessing is completed successfully..."
-            print(preprocess_message)
-            return preprocess_message
-        except FileNotFoundError as e:
-            preprocess_message = ("Error in Pre-processing (Battery) : ",e)
-            print(preprocess_message)
-            return preprocess_message
+            # Check if the file is already a CSV
+            if file.filename.endswith('.csv'):
+                file.seek(0)  # Move to the start of the file
+                df = pd.read_csv(file)
+            elif file.filename.endswith('.xlsx'):
+                file.seek(0)  # Move to the start of the file
+                df = pd.read_excel(file, engine='openpyxl')
+            elif file.filename.endswith('.xls'):
+                file.seek(0)  # Move to the start of the file
+                df = pd.read_excel(file, engine='xlrd')
+            else:
+                raise ValueError("Unsupported file format. Please upload a CSV or Excel file.")
 
-    def unique_id_finder_battery(self, directory):
+            # Log the contents of the dataframe
+            print("DataFrame content:\n", df.head())
+
+            # Preprocess the DataFrame
+            if df.empty:
+                raise ValueError("The uploaded file is empty or does not contain any columns.")
+
+            df.dropna(inplace=True)
+            if 'ITEMID' in df.columns:
+                df.rename(columns={'ITEMID': 'Item ID'}, inplace=True)
+            else:
+                print("Required column 'ITEMID' not found in the file.")
+
+            # Save the DataFrame back to a CSV (temporary saving for session use)
+            csv_buffer = StringIO()
+            df.to_csv(csv_buffer, index=False)
+            preprocess_message = "Data file is uploaded successfully."
+            print(preprocess_message)
+            return preprocess_message, df
+
+        except Exception as e:
+            preprocess_message = f"Error in uploading the data file: {e}"
+            print(preprocess_message)
+            return preprocess_message, None
+
+    def unique_id_finder_battery(self, file):
         try:
-            df = pd.read_csv(directory)
+            # Read the CSV file from the file object
+            file.seek(0)  # Move to the start of the file
+            df = pd.read_csv(file)
             unique_ids_list = df['Item ID'].unique()
             unique_names_list = df['Item name'].unique()
+            number_of_unique_ids = len(unique_ids_list)
             sorted_unique_names_list = sorted(unique_names_list)
-            folder_path = 'application/datafiles/battery_data_files/unique_battery_id_data_files'
+            folder_path = 'application/datafiles/unique_id_data_files'
 
             if not os.path.exists(folder_path):
                 os.makedirs(folder_path)
@@ -34,56 +64,37 @@ class BatteryRepository:
                 sanitized_item_id = re.sub(r'[^\w\-_. ]', '', str(every_item_id))
                 filename = os.path.join(folder_path, f'{sanitized_item_id}.csv')
                 item_data.to_csv(filename, index=False)
+
             unique_id_creator_message = "Unique data files based on Item Id, are created successfully..."
-            print(unique_id_creator_message)
-            return unique_id_creator_message, sorted_unique_names_list
+            return unique_id_creator_message, sorted_unique_names_list, number_of_unique_ids
 
         except FileNotFoundError as e:
-            unique_id_creator_message = ("Error in unique id data file creation (Battery) : ",e)
-            print(unique_id_creator_message)
-            return unique_id_creator_message
+            unique_id_creator_message = f"Error in unique id data file creation (Battery): {e}"
+            return unique_id_creator_message, None, None
 
-    def unique_dealer_finder_battery(self, directory):
+    def add_data(self, data, csv_path):
         try:
-            df = pd.read_csv(directory)
-            unique_dealers_list = df['Dealer'].unique()
-            folder_path = 'application/datafiles/battery_data_files/unique_battery_dealer_data_files'
+            # Create DataFrame with new data
+            new_row = pd.DataFrame(data, index=[0])
 
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path)
+            # Check if the CSV file exists
+            if not os.path.exists(csv_path):
+                # If the file doesn't exist, create a new one with the new data
+                new_row.to_csv(csv_path, index=False)
+            else:
+                # If the file exists, append the new data to it
+                df = pd.read_csv(csv_path)
+                df = pd.concat([df, new_row], ignore_index=True)
+                df.to_csv(csv_path, index=False)
 
-            for every_dealer in unique_dealers_list:
-                item_data = df[df['Dealer'] == every_dealer]
-                sanitized_dealer = re.sub(r'[^\w\-_. ]', '', str(every_dealer))
-                filename = os.path.join(folder_path, f'{sanitized_dealer}.csv')
-                item_data.to_csv(filename, index=False)
-            unique_dealer_creator_message = "Unique data files based on dealers, are created successfully..."
-            print(unique_dealer_creator_message)
-            return unique_dealer_creator_message
-        except FileNotFoundError as e:
-            unique_dealer_creator_message = ("Error in unique dealer data file creation (Battery) : ",e)
-            print(unique_dealer_creator_message)
-            return unique_dealer_creator_message
+            return True
 
-    def unique_year_finder_battery(self, directory):
-        try:
-            df = pd.read_csv(directory)
-            unique_years_list = df['Year'].unique()
-            folder_path = 'application/datafiles/battery_data_files/unique_battery_year_data_files'
+        except Exception as e:
+            print(f"Error adding data: {e}")
+            return False
 
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path)
+    def model_loader(self):
+        pass
 
-            for every_year in unique_years_list:
-                item_data = df[df['Year'] == every_year]
-                sanitized_year = re.sub(r'[^\w\-_. ]', '', str(every_year))
-                filename = os.path.join(folder_path, f'{sanitized_year}.csv')
-                item_data.to_csv(filename, index=False)
-
-            unique_year_creator_message = "Unique data files based on years, are created successfully..."
-            print(unique_year_creator_message)
-            return unique_year_creator_message
-        except FileNotFoundError as e:
-            unique_year_creator_message = ("Error in unique year data file creation (Battery) : ",e)
-            print(unique_year_creator_message)
-            return unique_year_creator_message
+    def sales_forecasting(self):
+        pass
